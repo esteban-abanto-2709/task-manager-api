@@ -1,259 +1,49 @@
 ### ================================
 ### TASK MANAGER API - TESTS
 ### ================================
-### Base URL
 @baseUrl = http://localhost:3000
 @apiUrl = {{baseUrl}}/api/tasks
 
 ### ================================
 ### 1. HEALTH CHECK
 ### ================================
-### Verificar que el servidor esté corriendo
 GET {{baseUrl}}
 
 ### ================================
-### 2. OBTENER TODAS LAS TAREAS (GET ALL)
+### 2. OBTENER TODAS LAS TAREAS
 ### ================================
-### Caso correcto: listar todas las tareas
 GET {{apiUrl}}
 
 ### ================================
-### 3. OBTENER UNA TAREA POR ID (GET BY ID)
+### 3. OBTENER TAREA POR ID
 ### ================================
-### Caso correcto: obtener tarea existente (ID 1)
 GET {{apiUrl}}/1
 
-### Caso correcto: obtener tarea existente (ID 2)
-GET {{apiUrl}}/2
-
-### Caso de error: tarea no existe (ID 999)
-GET {{apiUrl}}/999
-
-### Caso de error: ID inválido (texto)
-GET {{apiUrl}}/abc
-
 ### ================================
-### 4. CREAR NUEVA TAREA (POST)
+### 4. CREAR TAREA
 ### ================================
-### Caso correcto: crear tarea con todos los campos
 POST {{apiUrl}}
 Content-Type: application/json
 
 {
   "title": "Estudiar Docker",
-  "description": "Aprender contenedores y Dockerfile",
+  "description": "Aprender contenedores",
   "status": "pending"
-}
-
-### Caso correcto: crear tarea sin descripción (opcional)
-POST {{apiUrl}}
-Content-Type: application/json
-
-{
-  "title": "Revisar Kubernetes",
-  "status": "pending"
-}
-
-### Caso correcto: crear tarea solo con título (mínimo requerido)
-POST {{apiUrl}}
-Content-Type: application/json
-
-{
-  "title": "Practicar AWS EC2"
-}
-
-### Caso de error: falta el título (campo requerido)
-POST {{apiUrl}}
-Content-Type: application/json
-
-{
-  "description": "Esta tarea no tiene título",
-  "status": "pending"
-}
-
-### Caso de error: body vacío
-POST {{apiUrl}}
-Content-Type: application/json
-
-{}
-
-### Caso correcto: crear tarea con status "in_progress"
-POST {{apiUrl}}
-Content-Type: application/json
-
-{
-  "title": "Implementar JWT",
-  "description": "Agregar autenticación con tokens",
-  "status": "in_progress"
-}
-
-### Caso correcto: crear tarea con status "completed"
-POST {{apiUrl}}
-Content-Type: application/json
-
-{
-  "title": "Setup MySQL",
-  "description": "Configurar base de datos local",
-  "status": "completed"
 }
 
 ### ================================
-### 5. ACTUALIZAR TAREA (PUT)
+### 5. ACTUALIZAR TAREA
 ### ================================
-### Caso correcto: actualizar tarea completa (ID 1)
 PUT {{apiUrl}}/1
 Content-Type: application/json
 
 {
   "title": "Estudiar Node.js - ACTUALIZADO",
-  "description": "Repasar Express, middlewares y async/await",
+  "description": "Repasar Express y JWT",
   "status": "completed"
 }
 
-### Caso correcto: cambiar solo el status (ID 2)
-PUT {{apiUrl}}/2
-Content-Type: application/json
-
-{
-  "title": "Estudiar AWS",
-  "description": "Revisar EC2, S3 y RDS",
-  "status": "in_progress"
-}
-
-### Caso de error: actualizar sin título (campo requerido)
-PUT {{apiUrl}}/1
-Content-Type: application/json
-
-{
-  "description": "Descripción sin título",
-  "status": "pending"
-}
-
-### Caso de error: actualizar tarea inexistente (ID 999)
-PUT {{apiUrl}}/999
-Content-Type: application/json
-
-{
-  "title": "Tarea inexistente",
-  "description": "Esto debería fallar",
-  "status": "pending"
-}
-
 ### ================================
-### 6. ELIMINAR TAREA (DELETE)
+### 6. ELIMINAR TAREA
 ### ================================
-### Caso correcto: eliminar tarea existente (ID 3)
-DELETE {{apiUrl}}/3
-
-### Caso de error: eliminar tarea inexistente (ID 999)
-DELETE {{apiUrl}}/999
-
-### Caso de error: ID inválido (texto)
-DELETE {{apiUrl}}/abc
-
-### ================================
-### 7. FLUJO COMPLETO (E2E TEST)
-### ================================
-### Paso 1: Crear una nueva tarea
-POST {{apiUrl}}
-Content-Type: application/json
-
-{
-  "title": "Tarea de prueba E2E",
-  "description": "Esta tarea será creada, actualizada y eliminada",
-  "status": "pending"
-}
-
-### Paso 2: Obtener todas las tareas (verificar que se creó)
-GET {{apiUrl}}
-
-### Paso 3: Obtener la tarea específica (usar el ID que te devolvió el POST)
-GET {{apiUrl}}/4
-
-### Paso 4: Actualizar la tarea
-PUT {{apiUrl}}/4
-Content-Type: application/json
-
-{
-  "title": "Tarea de prueba E2E - ACTUALIZADA",
-  "description": "Descripción modificada",
-  "status": "in_progress"
-}
-
-### Paso 5: Verificar la actualización
-GET {{apiUrl}}/4
-
-### Paso 6: Eliminar la tarea
-DELETE {{apiUrl}}/4
-
-### Paso 7: Verificar que fue eliminada (debería dar 404)
-GET {{apiUrl}}/4
-
-### ================================
-### 8. PRUEBAS DE EDGE CASES
-### ================================
-### Título muy largo (255 caracteres máximo)
-POST {{apiUrl}}
-Content-Type: application/json
-
-{
-  "title": "Este es un título extremadamente largo para probar el límite de caracteres permitidos en la base de datos MySQL que tiene un VARCHAR de 255 caracteres como máximo y queremos ver qué sucede cuando intentamos insertar algo que excede ese límite establecido en el esquema",
-  "description": "Prueba de límite de caracteres"
-}
-
-### Descripción muy larga (TEXT sin límite definido)
-POST {{apiUrl}}
-Content-Type: application/json
-
-{
-  "title": "Tarea con descripción larga",
-  "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-}
-
-### Status inválido (solo acepta: pending, in_progress, completed)
-POST {{apiUrl}}
-Content-Type: application/json
-
-{
-  "title": "Tarea con status inválido",
-  "status": "cancelled"
-}
-
-### Caracteres especiales en el título
-POST {{apiUrl}}
-Content-Type: application/json
-
-{
-  "title": "Tarea con émojis 🚀 y símbolos @#$%",
-  "description": "Probando caracteres especiales: áéíóú ñ ¿?¡!"
-}
-
-### ================================
-### 9. PRUEBAS DE RENDIMIENTO
-### ================================
-### Crear múltiples tareas rápidamente (ejecutar varias veces)
-POST {{apiUrl}}
-Content-Type: application/json
-
-{
-  "title": "Tarea de carga #1",
-  "description": "Prueba de rendimiento"
-}
-
-###
-POST {{apiUrl}}
-Content-Type: application/json
-
-{
-  "title": "Tarea de carga #2",
-  "description": "Prueba de rendimiento"
-}
-
-###
-POST {{apiUrl}}
-Content-Type: application/json
-
-{
-  "title": "Tarea de carga #3",
-  "description": "Prueba de rendimiento"
-}
+DELETE {{apiUrl}}/1

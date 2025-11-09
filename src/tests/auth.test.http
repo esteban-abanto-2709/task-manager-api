@@ -1,0 +1,164 @@
+### ================================
+### AUTHENTICATION TESTS
+### ================================
+@baseUrl = http://localhost:3000
+@authUrl = {{baseUrl}}/api/auth
+@tasksUrl = {{baseUrl}}/api/tasks
+
+### ================================
+### 1. REGISTER - Crear usuario
+### ================================
+POST {{authUrl}}/register
+Content-Type: application/json
+
+{
+  "name": "Esteban Abanto",
+  "email": "esteban@test.com",
+  "password": "123456"
+}
+
+### ================================
+### 2. LOGIN - Obtener token
+### ================================
+# @name login
+POST {{authUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "esteban@test.com",
+  "password": "123456"
+}
+
+### Guardar el token de la respuesta anterior
+### Copia el valor de "token" y pégalo abajo:
+@token = PEGA_AQUI_EL_TOKEN
+
+### ================================
+### 3. CREAR TAREA (con token)
+### ================================
+POST {{tasksUrl}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Mi primera tarea con JWT",
+  "description": "Esta tarea está protegida",
+  "status": "pending"
+}
+
+### ================================
+### 4. OBTENER MIS TAREAS (con token)
+### ================================
+GET {{tasksUrl}}
+Authorization: Bearer {{token}}
+
+### ================================
+### 5. OBTENER TAREA POR ID (con token)
+### ================================
+GET {{tasksUrl}}/1
+Authorization: Bearer {{token}}
+
+### ================================
+### 6. ACTUALIZAR TAREA (con token)
+### ================================
+PUT {{tasksUrl}}/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Tarea actualizada",
+  "description": "Nueva descripción",
+  "status": "completed"
+}
+
+### ================================
+### 7. ELIMINAR TAREA (con token)
+### ================================
+DELETE {{tasksUrl}}/1
+Authorization: Bearer {{token}}
+
+### ================================
+### 8. INTENTAR ACCEDER SIN TOKEN (debe fallar)
+### ================================
+GET {{tasksUrl}}
+
+### ================================
+### 9. INTENTAR ACCEDER CON TOKEN INVÁLIDO (debe fallar)
+### ================================
+GET {{tasksUrl}}
+Authorization: Bearer token_invalido_123
+
+### ================================
+### 10. REGISTER - Error: email duplicado
+### ================================
+POST {{authUrl}}/register
+Content-Type: application/json
+
+{
+  "name": "Usuario Repetido",
+  "email": "esteban@test.com",
+  "password": "123456"
+}
+
+### ================================
+### 11. LOGIN - Error: credenciales incorrectas
+### ================================
+POST {{authUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "esteban@test.com",
+  "password": "password_incorrecto"
+}
+
+### ================================
+### 12. REGISTER - Crear segundo usuario
+### ================================
+POST {{authUrl}}/register
+Content-Type: application/json
+
+{
+  "name": "Ana García",
+  "email": "ana@test.com",
+  "password": "654321"
+}
+
+### ================================
+### 13. LOGIN - Ana (segundo usuario)
+### ================================
+# @name loginAna
+POST {{authUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "ana@test.com",
+  "password": "654321"
+}
+
+### Guardar token de Ana
+@tokenAna = PEGA_AQUI_EL_TOKEN_DE_ANA
+
+### ================================
+### 14. Ana crea su tarea
+### ================================
+POST {{tasksUrl}}
+Content-Type: application/json
+Authorization: Bearer {{tokenAna}}
+
+{
+  "title": "Tarea de Ana",
+  "description": "Solo Ana puede verla",
+  "status": "pending"
+}
+
+### ================================
+### 15. Ana ve sus tareas (NO ve las de Esteban)
+### ================================
+GET {{tasksUrl}}
+Authorization: Bearer {{tokenAna}}
+
+### ================================
+### 16. Esteban ve sus tareas (NO ve las de Ana)
+### ================================
+GET {{tasksUrl}}
+Authorization: Bearer {{token}}

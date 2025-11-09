@@ -1,7 +1,10 @@
 import express from 'express';
 import taskController from '../controllers/task.controller.js';
+import { authMiddleware } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
+
+router.use(authMiddleware);
 
 /**
  * @swagger
@@ -50,7 +53,32 @@ router.get('/:id', taskController.getTaskById.bind(taskController));
  */
 router.post('/', taskController.createTask.bind(taskController));
 
+/**
+ * @swagger
+ * /api/tasks/{id}:
+ *   put:
+ *     summary: Update task by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ */
 router.put('/:id', taskController.updateTask.bind(taskController));
+
+/**
+ * @swagger
+ * /api/tasks/{id}:
+ *   delete:
+ *     summary: Delete task by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ */
 router.delete('/:id', taskController.deleteTask.bind(taskController));
 
 export default router;

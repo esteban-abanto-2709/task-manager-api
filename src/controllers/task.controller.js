@@ -2,10 +2,9 @@ import taskService from '../services/task.service.js';
 
 class TaskController {
 
-    // GET /api/tasks
     async getAllTasks(req, res) {
         try {
-            const tasks = await taskService.getAllTasks();
+            const tasks = await taskService.getAllTasks(req.userId);
             res.json({
                 success: true,
                 data: tasks
@@ -19,10 +18,9 @@ class TaskController {
         }
     }
 
-    // GET /api/tasks/:id
     async getTaskById(req, res) {
         try {
-            const task = await taskService.getTaskById(req.params.id);
+            const task = await taskService.getTaskById(req.params.id, req.userId);
             
             if (!task) {
                 return res.status(404).json({
@@ -44,12 +42,10 @@ class TaskController {
         }
     }
 
-    // POST /api/tasks
     async createTask(req, res) {
         try {
             const { title, description, status } = req.body;
             
-            // Validación básica
             if (!title) {
                 return res.status(400).json({
                     success: false,
@@ -57,7 +53,10 @@ class TaskController {
                 });
             }
             
-            const newTask = await taskService.createTask({ title, description, status });
+            const newTask = await taskService.createTask(
+                { title, description, status },
+                req.userId
+            );
             
             res.status(201).json({
                 success: true,
@@ -72,12 +71,10 @@ class TaskController {
         }
     }
 
-    // PUT /api/tasks/:id
     async updateTask(req, res) {
         try {
             const { title, description, status } = req.body;
             
-            // Validación básica
             if (!title) {
                 return res.status(400).json({
                     success: false,
@@ -85,7 +82,11 @@ class TaskController {
                 });
             }
             
-            const updatedTask = await taskService.updateTask(req.params.id, { title, description, status });
+            const updatedTask = await taskService.updateTask(
+                req.params.id,
+                { title, description, status },
+                req.userId
+            );
             
             if (!updatedTask) {
                 return res.status(404).json({
@@ -107,10 +108,9 @@ class TaskController {
         }
     }
 
-    // DELETE /api/tasks/:id
     async deleteTask(req, res) {
         try {
-            const task = await taskService.getTaskById(req.params.id);
+            const task = await taskService.getTaskById(req.params.id, req.userId);
             
             if (!task) {
                 return res.status(404).json({
@@ -119,7 +119,7 @@ class TaskController {
                 });
             }
 
-            await taskService.deleteTask(req.params.id);
+            await taskService.deleteTask(req.params.id, req.userId);
             
             res.json({
                 success: true,
